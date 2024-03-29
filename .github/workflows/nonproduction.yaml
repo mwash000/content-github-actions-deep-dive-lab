@@ -1,0 +1,29 @@
+name: Non Production Static Site Workflow
+
+on:
+  push:
+    branches:
+      - feature*
+
+jobs:
+  Config-AWS-Creds:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+      - name: "Configure AWS Credentials" Action for GitHub Actions
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCOUNT_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      - name: set up node js
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: 18
+      - name: build site
+        run: |
+          npm ci
+          npm run build
+      - name: deploy files to bucket
+        run: aws
